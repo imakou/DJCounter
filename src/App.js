@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
@@ -8,13 +8,14 @@ import {
   makeStyles,
   DialogActions,
   DialogContent,
-  DialogTitle
+  DialogTitle,
+  CircularProgress
 } from "@material-ui/core";
 import "./index.css";
 import { initializeApp } from "firebase";
 import "firebase/app";
 var firebaseConfig = {
-  apiKey: "AIzaSyA3eqCFZ-Y_lyU55IjZMQI4OFYkkKW4GCQ",
+  apiKey: "AIzaSyAhWU8C5rNrAaobBcWeHD_Y3Emd1zEMZU0",
   authDomain: "djcounter-9057a.firebaseapp.com",
   databaseURL: "https://djcounter-9057a.firebaseio.com",
   storageBucket: "djcounter-9057a.appspot.com"
@@ -40,34 +41,44 @@ const useStyles = makeStyles(theme => ({
     color: "#fff",
     textShadow: "1px 2px 0px black;",
     padding: 10,
-    backgroundColor: "rgba(30,144,255,0.5)"
+    backgroundColor: "rgba(30,144,255,0.8)"
+  },
+  ButtonDisabled: {
+    color: "white !important",
+    backgroundColor: "grey  !important"
   },
   DialogRoot: {
     backgroundColor: "#f5b501"
   },
   goalSpan: {
-    color: "rgba(230, 52, 52, 1)",
+    color: "#fff",
     fontSize: 15
   },
   DialogContent: {
-    fontSize: "28px"
+    fontSize: "22px"
   },
   DialogActions: {
     justifyContent: "center"
   },
   buttonSubmit: {
     fontSize: "15px"
+  },
+  subTitle: {
+    display: "inline-block",
+    backgroundColor: "red"
   }
 }));
 
 const App = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [isDataLoaded, setDataLoaded] = useState(false);
   const [localCount, setCount] = useState("-");
-  const rootRef = firebaseApp.database().ref("/");
+  const rootRef = firebaseApp.database().ref();
   useEffect(() => {
-    rootRef.on("value", snapshot => {
-      const { counter } = snapshot.val();
+    rootRef.child("counter").on("value", snapshot => {
+      const counter = snapshot.val();
+      setDataLoaded(true);
       setCount(counter);
     });
   }, []);
@@ -80,7 +91,12 @@ const App = () => {
   };
 
   const completedDJ = () => {
-    rootRef.child("counter").set(Number(localCount + 1));
+    let updates = {};
+    const newConut = Number(localCount + 1);
+    updates["counter"] = Number(newConut);
+    if (newConut > localCount) {
+      rootRef.update(updates);
+    }
     setOpen(false);
   };
 
@@ -89,6 +105,8 @@ const App = () => {
       <Box my={4}>
         <Typography variant="h6" className={classes.container}>
           發一崇德多倫多所有佛堂
+          <br />
+          <span className={classes.subTitle}>祈願全球眾生平安 加拿大加油</span>
           <br />
           響應您我凝聚善願同步誦經祈願
           <br />
@@ -108,16 +126,24 @@ const App = () => {
           <br />
         </Typography>
         <Box
-          bgcolor="warning.main"
+          bgcolor="error.main"
           display="flex"
           alignItems="center"
           flexDirection="column"
           p={3}
         >
-          <Typography variant="h5">誦經累計次數：{localCount}</Typography>
-          <span className={classes.goalSpan}>
-            恭誦彌勒救苦真經：{localCount * 3} 遍
-          </span>
+          {isDataLoaded ? (
+            <Fragment>
+              <Typography color="textPrimary" variant="h5">
+                誦經累計次數：{localCount}
+              </Typography>
+              <span className={classes.goalSpan}>
+                恭誦彌勒救苦真經：{localCount * 3} 遍
+              </span>
+            </Fragment>
+          ) : (
+            <CircularProgress />
+          )}
         </Box>
 
         <Box display="flex" justifyContent="center">
@@ -126,6 +152,8 @@ const App = () => {
             color="primary"
             onClick={() => handleClickOpen()}
             className={classes.button}
+            classes={{ disabled: classes.ButtonDisabled }}
+            disabled={!isDataLoaded}
           >
             🙏完成誦經三遍，請按此🙏
           </Button>
@@ -141,11 +169,11 @@ const App = () => {
           <DialogTitle id="alert-dialog-title">迴向文：</DialogTitle>
           <DialogContent>
             <Typography variant="h6" className={classes.DialogContent}>
-              願迴向此誦經功德
+              願以此誦經功德
               <br />
-              平息新冠狀肺炎疫情
+              迴向新冠狀肺炎疫情平息
               <br />
-              願眾生平安
+              祈願眾生平安
             </Typography>
           </DialogContent>
           <DialogActions className={classes.DialogActions}>
