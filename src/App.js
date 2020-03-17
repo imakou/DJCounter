@@ -66,6 +66,9 @@ const useStyles = makeStyles(theme => ({
   subTitle: {
     display: "inline-block",
     backgroundColor: "red"
+  },
+  whiteColor: {
+    color: "#fff"
   }
 }));
 
@@ -134,7 +137,7 @@ const App = () => {
         >
           {isDataLoaded ? (
             <Fragment>
-              <Typography color="textPrimary" variant="h5">
+              <Typography className={classes.whiteColor} variant="h5">
                 誦經累計次數：{localCount}
               </Typography>
               <span className={classes.goalSpan}>
