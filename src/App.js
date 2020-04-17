@@ -51,8 +51,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#f5b501"
   },
   goalSpan: {
-    color: "#fff",
-    fontSize: 15
+    fontSize: 16
   },
   DialogContent: {
     fontSize: "22px"
@@ -129,7 +128,7 @@ const App = () => {
           <br />
         </Typography>
         <Box
-          bgcolor="error.main"
+          bgcolor="warning.main"
           display="flex"
           alignItems="center"
           flexDirection="column"
@@ -137,7 +136,7 @@ const App = () => {
         >
           {isDataLoaded ? (
             <Fragment>
-              <Typography className={classes.whiteColor} variant="h5">
+              <Typography variant="h5">
                 誦經累計次數：{localCount}
               </Typography>
               <span className={classes.goalSpan}>
